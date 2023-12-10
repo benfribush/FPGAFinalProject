@@ -3,6 +3,15 @@
 # Updated CV2 Optimization 
 # Adjusted resolution 
 
+'''
+This is the current working version. 
+- Single image inference ran in loop 
+- .png files used over .jpg for better quality
+- CV2 resolution changed to 256x144 (test for further downconversion) 
+- Shadowing and Grayscale conversion happens before 28x28 downconversion 
+- Inferences are correct if number drawn correctly (test for valid numbers)
+- Complete inference takes 0.14 sec = 7.14fps
+'''
 
 import bnn
 import cv2
@@ -21,6 +30,11 @@ import time
 from array import *
 from PIL import Image as PIL_Image
 from PIL import ImageOps
+import keyboard
+from pynq import Overlay
+#overlay = Overlay("lfcW1A2-pynqZ1-Z2.bit")
+
+
 
 
 
@@ -35,10 +49,15 @@ timeArray = []
 
 cap = cv2.VideoCapture(-1, cv2.CAP_V4L2)
 W, H = 256, 144
+#W, H = 1400, 1000
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
-for i in range(10):
+i =0
+a = 'a'
+outputCount = np.array([0,0,0,0,0,0,0,0,0,0])
+while (i <= 10) and (a != 's'):
+    startTime = time.time()
     _ , cv2_im = cap.read()
     cv2_im = cv2.cvtColor(cv2_im,cv2.COLOR_BGR2RGB)
     #Code Above takes 0.7 seconds
@@ -178,12 +197,42 @@ for i in range(10):
     
     print("Class number: {0}".format(class_out))
     print("Class name: {0}".format(hw_classifier.class_name(class_out)))
-
-   
-    #cap.release()
+    
+    match class_out:
+        case 0:
+            outputCount[0] = outputCount[0]+1
+        case 1: 
+            outputCount[1] = outputCount[1]+1
+        case 2:
+            outputCount[2] = outputCount[2]+1
+        case 3: 
+            outputCount[3] = outputCount[3]+1
+        case 4:
+            outputCount[4] = outputCount[4]+1
+        case 5: 
+            outputCount[5] = outputCount[5]+1
+        case 6:
+            outputCount[6] = outputCount[6]+1
+        case 7: 
+            outputCount[7] = outputCount[7]+1
+        case 8:
+            outputCount[8] = outputCount[8]+1
+        case 9: 
+            outputCount[9] = outputCount[9]+1
+            
+            
+    
+               
+               
+ 
+            
     
 
+    #cap.release()
+    
+    endTime = time.time()
     timeArray.append(endTime - startTime)
+    i = i + 1
 
 
 #plt.imshow(nope)
@@ -199,6 +248,7 @@ print(arr)
 print('')
 print('Average time per inference in seconds:')
 print(np.average(arr))
+print(outputCount)
 plt.imshow(crack)
 plt.show()
 plt.imshow(crackProcessed)
@@ -210,13 +260,6 @@ cap.release()
 img
 
 
+
 ################################ Accuracy #################################
 # All numbers are identified correctly if they are drawn correctly 
-
-
-
-
-
-
-
-
