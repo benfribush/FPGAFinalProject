@@ -58,13 +58,24 @@ print('')
 clear_output(wait=True)
 state = True
 
+imageCaptureTime = 0
+shadowingTime = 0
+imageEnhancementTime = 0
+boundingBoxTime = 0
+downConversionTime = 0
+
+
+
 while(state == True):
     clear_output(wait=True)
     startChar = input('Press \'s\' to Begin Image Capture and Inference or \'q\' to Quit: ')
     clear_output(wait=True)
     cap = cv2.VideoCapture(-1, cv2.CAP_V4L2)
+    #W, H = 192, 108
     W, H = 256, 144
-    #W, H = 1400, 1000
+    #W, H = 854, 480
+    #W, H = 1280, 720
+    #W, H = 1920, 1080
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
@@ -75,8 +86,10 @@ while(state == True):
         timeArray = []
         while (i <= 24):
             startTime = time.time()
+            start1 = time.time()
             _ , cv2_im = cap.read()
             cv2_im = cv2.cvtColor(cv2_im,cv2.COLOR_BGR2RGB)
+            end1 = time.time()
             #Code Above takes 0.7 seconds
             #cap.release() = 0.8 seconds
 
@@ -85,6 +98,7 @@ while(state == True):
 
     
     #################################### Shadowing #######################################
+            start2 = time.time()
             rgb_planes = cv2.split(yes)
             result_planes = []
             result_norm_planes = []
@@ -105,6 +119,7 @@ while(state == True):
     
             #cv2.imwrite('shadows_out.jpg', result)
             cv2.imwrite('NoShadows.png', result_norm)
+            end2 = time.time()
 
 
 
@@ -121,7 +136,8 @@ while(state == True):
             #orig_img_path = '/home/xilinx/jupyter_notebooks/bnn/pictures/webcam_image_mnist.jpg'
             #img = PIL_Image.open(orig_img_path).convert("L")     
                    
-            #Image enhancement                
+            #Image enhancement      
+            start3 = time.time()
             contr = ImageEnhance.Contrast(img)
             img = contr.enhance(4.5)                                                    # The enhancement values (contrast and brightness) 
             bright = ImageEnhance.Brightness(img)                                     # depends on backgroud, external lights etc
@@ -130,13 +146,14 @@ while(state == True):
             #img = img.rotate(180)                                                     # Rotate the image (depending on camera orientation)
             #Adding a border for future cropping
             img = ImageOps.expand(img,border=80,fill='white') 
+            end3 = time.time()
 
-
-
-
+            start4 = time.time()
             inverted = ImageOps.invert(img)  
             box = inverted.getbbox()  
             img_new = img.crop(box)  
+            end4 = time.time()
+            start5 = time.time()
             width, height = img_new.size  
             ratio = min((28./height), (28./width))  
             background = PIL_Image.new('RGB', (28,28), (255,255,255))  
@@ -153,11 +170,10 @@ while(state == True):
             img_data=np.asarray(background)  
             img_data = img_data[:,:,0]  
             imageio.imwrite('DownConvertered.png', img_data) 
+            end5 = time.time()
             nope = mpimg.imread('DownConvertered.png')
             #plt.imshow(nope)
             #plt.show()
-
-
 
 
             img_load = PIL_Image.open('DownConvertered.png').convert("L")  
@@ -314,15 +330,33 @@ while(state == True):
         state = False
         
 print('Done')
+print('')
+print("Image capture time: {}".format(end1 - start1))
+print('')
+print("Shadowing time: {}".format(end2 - start2))
+print('')
+print("Image enhancement time: {}".format(end3 - start3))
+print('')
+print("Bounding box time: {}".format(end4 - start4))
+print('')
+print("Down conversion time: {}".format(end5 - start5))
+print('')
+print("Total Time: {}".format(endTime - startTime))
 cap.release()
 print('')
 print('')
 print('')
-plt.imshow(crack)
-plt.show()
+#plt.imshow(crack)
+#plt.show()
 plt.imshow(crackProcessed)
 plt.show()
+raw = mpimg.imread('RawIMAGE.png')
+plt.imshow(raw)
+plt.show()
 img
+
+
+
 
 
 
