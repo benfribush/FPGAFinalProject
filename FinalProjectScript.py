@@ -73,7 +73,7 @@ while(state == True):
         i=0
         outputCount = np.array([0,0,0,0,0,0,0,0,0,0])
         timeArray = []
-        while (i <= 10):
+        while (i <= 24):
             startTime = time.time()
             _ , cv2_im = cap.read()
             cv2_im = cv2.cvtColor(cv2_im,cv2.COLOR_BGR2RGB)
@@ -250,7 +250,7 @@ while(state == True):
     
             endTime = time.time()
             timeArray.append(endTime - startTime)
-            time.sleep(0.5)
+            #time.sleep(0.5)
             i = i + 1
 
 
@@ -262,18 +262,50 @@ while(state == True):
         print('')
         print('')
         print('')
-        print("Time in seconds per inference of 25 images:")
-        print(arr)
+        #print("Time in seconds per inference of 25 images:")
+        #print(arr)
         print('')
         print('Average time per inference in seconds:')
         print(np.average(arr))
         print(outputCount)
         #plt.imshow(crack)
         #plt.show()
+
+        #xVals = [0,1,2,3,4,5,6,7,8,9]
+        #yVals = outputCount
+  
+        #fig = plt.figure(figsize = (10, 5))
+ 
+        # creating the bar plot
+        #plt.bar(xVals, yVals, color ='blue', 
+        #width = 0.4)
+ 
+        #plt.xlabel("Inference Result ")
+        #plt.ylabel("Inference Result Count")
+        #plt.title("Frequency of Inference Result from Images")
+        #plt.show()
+        
+
+        x = ["0","1","2","3","4","5","6","7","8","9"]
+        plt.barh(x, outputCount)
+ 
+        for index, value in enumerate(outputCount):
+            plt.text(value, index,
+            str(value))
+ 
+        plt.show()
+        print('')
+        print("Inference Result: {}".format(class_out))
+        print("Probability: {}%".format(max(outputCount)/sum(outputCount)*100))
+        
+        
+        
+        
+        
         plt.imshow(crackProcessed)
         plt.show()
         cap.release()
-        outputCount
+        #outputCount
 
 
 
@@ -282,6 +314,7 @@ while(state == True):
         state = False
         
 print('Done')
+cap.release()
 print('')
 print('')
 print('')
@@ -290,6 +323,7 @@ plt.show()
 plt.imshow(crackProcessed)
 plt.show()
 img
+
 
 
 
